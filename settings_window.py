@@ -32,7 +32,7 @@ class SettingsWindow(QDialog):
         # 默认值
         self.defaults = {
             "add": {"x_min": 2, "x_max": 100, "y_min": 2, "y_max": 100},
-            "sub": {"x_min": 4, "x_max": 200, "y_min": 4, "y_max": 200},
+            "sub": {"x_min": 4, "x_max": 200, "y_min": 2, "y_max": 100},
             "mul": {"x_min": 2, "x_max": 100, "y_min": 2, "y_max": 12},
             "div": {"y_min": 2, "y_max": 100, "result_min": 2, "result_max": 12}
         }
