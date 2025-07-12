@@ -31,10 +31,10 @@ class SettingsWindow(QDialog):
         
         # 默认值
         self.defaults = {
-            "add": {"x_min": 1, "x_max": 199, "y_min": 1, "y_max": 199},
-            "sub": {"x_min": 1, "x_max": 199, "y_min": 1, "y_max": 199},
-            "mul": {"x_min": 1, "x_max": 99, "y_min": 1, "y_max": 19},
-            "div": {"y_min": 1, "y_max": 99, "result_min": 1, "result_max": 19}
+            "add": {"x_min": 2, "x_max": 100, "y_min": 2, "y_max": 100},
+            "sub": {"x_min": 4, "x_max": 200, "y_min": 4, "y_max": 200},
+            "mul": {"x_min": 2, "x_max": 100, "y_min": 2, "y_max": 12},
+            "div": {"y_min": 2, "y_max": 100, "result_min": 2, "result_max": 12}
         }
         
         self.settings = self.defaults.copy()
