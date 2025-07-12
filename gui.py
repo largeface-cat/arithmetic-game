@@ -27,15 +27,22 @@ class Ui_MainWindow(object):
         
         # 倒计时标签
         self.CountDownLabel = QtWidgets.QLabel(self.centralwidget)
-        self.CountDownLabel.setGeometry(QtCore.QRect(420, 50, 150, 30))
+        self.CountDownLabel.setGeometry(QtCore.QRect(420, 50, 300, 30))
         self.CountDownLabel.setObjectName("CountDownLabel")
         self.CountDownLabel.setFont(QtGui.QFont("Arial", 14))
         
         # 分数标签
         self.ScoreLabel = QtWidgets.QLabel(self.centralwidget)
-        self.ScoreLabel.setGeometry(QtCore.QRect(420, 100, 150, 30))
+        self.ScoreLabel.setGeometry(QtCore.QRect(420, 100, 300, 30))
         self.ScoreLabel.setObjectName("ScoreLabel")
         self.ScoreLabel.setFont(QtGui.QFont("Arial", 14))
+
+        # 上一题用时标签
+        self.LastTimeLabel = QtWidgets.QLabel(self.centralwidget)
+        self.LastTimeLabel.setGeometry(QtCore.QRect(420, 150, 300, 30))
+        self.LastTimeLabel.setObjectName("LastTimeLabel")
+        self.LastTimeLabel.setFont(QtGui.QFont("Arial", 12))
+        self.LastTimeLabel.setText("Last interval: N/A")
         
         # 添加游戏标题
         self.TitleLabel = QtWidgets.QLabel(self.centralwidget)
@@ -57,13 +64,36 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
+        # 游戏结束按钮区域
+        self.game_over_widget = QtWidgets.QWidget(self.centralwidget)
+        self.game_over_widget.setGeometry(QtCore.QRect(150, 300, 400, 150))
+        self.game_over_widget.setObjectName("game_over_widget")
+        self.game_over_layout = QtWidgets.QVBoxLayout(self.game_over_widget)
+        self.game_over_layout.setAlignment(QtCore.Qt.AlignCenter)
+
+        # Play Again 按钮
+        self.play_again_btn = QtWidgets.QPushButton("Play Again")
+        self.play_again_btn.setFixedSize(200, 50)
+        self.play_again_btn.setFont(QtGui.QFont("Arial", 12))
+        self.game_over_layout.addWidget(self.play_again_btn, 0, QtCore.Qt.AlignCenter)
+
+        # Relaunch 按钮
+        # self.relaunch_btn = QtWidgets.QPushButton("Relaunch")
+        # self.relaunch_btn.setFixedSize(200, 50)
+        # self.relaunch_btn.setFont(QtGui.QFont("Arial", 12))
+        # self.game_over_layout.addWidget(self.relaunch_btn, 0, QtCore.Qt.AlignCenter)
+
+        # 初始隐藏游戏结束按钮
+        self.game_over_widget.setVisible(False)
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Math Game"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Arithmetic game"))
         self.CountDownLabel.setText(_translate("MainWindow", "Time: 120s"))
         self.ScoreLabel.setText(_translate("MainWindow", "Score: 0"))
-        self.TitleLabel.setText(_translate("MainWindow", "Math Game"))
+        self.LastTimeLabel.setText(_translate("MainWindow", "Last interval: N/A"))
+        self.TitleLabel.setText(_translate("MainWindow", "Arithmetic game"))
 # [file content end]

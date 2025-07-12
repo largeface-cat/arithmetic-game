@@ -3,7 +3,7 @@
 import random
 
 def generate_expression(settings):
-    operators = ['+', '-', '*', '/']
+    operators = settings.get("enabled_ops", ['+', '-', '*', '/'])
     op = random.choice(operators)
     
     if op == '+':
@@ -24,8 +24,10 @@ def generate_expression(settings):
         y_max = settings["sub"]["y_max"]
         
         # 确保结果非负
-        x = random.randint(max(x_min, y_min), x_max)
-        y = random.randint(y_min, min(y_max, x))  # y不超过x
+        x = random.randint(x_min, x_max)
+        y = random.randint(y_min, y_max)  # y不超过x
+        if x < y:
+            x, y = y, x
         result = x - y
     elif op == '*':
         # 使用乘法设置
@@ -36,8 +38,6 @@ def generate_expression(settings):
 
         x = random.randint(x_min, x_max)
         y = random.randint(y_min, y_max)
-        result = x * y
-        
         result = x * y
     else:  # division
         # 使用除法设置

@@ -2,9 +2,9 @@
 # [file content begin]
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QGridLayout, QLabel, QLineEdit, 
-    QPushButton, QGroupBox, QMessageBox, QWhatsThis
+    QPushButton, QGroupBox, QMessageBox, QCheckBox, QComboBox, QHBoxLayout
 )
-from PyQt5.QtCore import Qt, QEvent
+from PyQt5.QtCore import Qt
 
 class SettingsWindow(QDialog):
     def __init__(self, parent=None):
@@ -33,8 +33,8 @@ class SettingsWindow(QDialog):
         self.defaults = {
             "add": {"x_min": 1, "x_max": 199, "y_min": 1, "y_max": 199},
             "sub": {"x_min": 1, "x_max": 199, "y_min": 1, "y_max": 199},
-            "mul": {"x_min": 1, "x_max": 99, "y_min": 1, "y_max": 10},
-            "div": {"y_min": 1, "y_max": 99, "result_min": 1, "result_max": 9}
+            "mul": {"x_min": 1, "x_max": 99, "y_min": 1, "y_max": 19},
+            "div": {"y_min": 1, "y_max": 99, "result_min": 1, "result_max": 19}
         }
         
         self.settings = self.defaults.copy()
@@ -135,6 +135,36 @@ class SettingsWindow(QDialog):
         div_group.setLayout(div_layout)
         main_layout.addWidget(div_group)
         
+        # 添加运算符选择复选框
+        self.add_enabled = QCheckBox("Enable +", self)
+        self.add_enabled.setChecked(True)
+        add_layout.addWidget(self.add_enabled, 0, 4)
+
+        self.sub_enabled = QCheckBox("Enable -", self)
+        self.sub_enabled.setChecked(True)
+        sub_layout.addWidget(self.sub_enabled, 0, 4)
+
+        self.mul_enabled = QCheckBox("Enable *", self)
+        self.mul_enabled.setChecked(True)
+        mul_layout.addWidget(self.mul_enabled, 0, 4)
+
+        self.div_enabled = QCheckBox("Enable /", self)
+        self.div_enabled.setChecked(True)
+        div_layout.addWidget(self.div_enabled, 0, 4)
+
+        # 添加时间选择下拉框
+        time_group = QGroupBox("Time Settings")
+        time_layout = QHBoxLayout()
+
+        time_layout.addWidget(QLabel("Duration:"))
+        self.time_combo = QComboBox()
+        self.time_combo.addItems(["30s", "60s", "120s", "300s"])
+        self.time_combo.setCurrentIndex(2)  # 默认选择120s
+        time_layout.addWidget(self.time_combo)
+
+        time_group.setLayout(time_layout)
+        main_layout.addWidget(time_group)
+
         # 开始按钮
         self.start_btn = QPushButton("Start Game")
         self.start_btn.clicked.connect(self.validate_and_start)
@@ -182,14 +212,45 @@ class SettingsWindow(QDialog):
                 raise ValueError("All values must be positive integers")
             
             # 检查范围是否有效 (min <= max)
-            if (add_x_min > add_x_max or add_y_min > add_y_max or
-                sub_x_min > sub_x_max or sub_y_min > sub_y_max or
-                mul_x_min > mul_x_max or mul_y_min > mul_y_max or
-                div_y_min > div_y_max or div_result_min > div_result_max):
+            if ((self.add_enabled.isChecked() and (add_x_min > add_x_max or add_y_min > add_y_max)) or
+                (self.sub_enabled.isChecked() and (sub_x_min > sub_x_max or sub_y_min > sub_y_max)) or
+                (self.mul_enabled.isChecked() and (mul_x_min > mul_x_max or mul_y_min > mul_y_max)) or
+                (self.div_enabled.isChecked() and (div_y_min > div_y_max or div_result_min > div_result_max))):
                 raise ValueError("Min values must be less than or equal to max values")
             
+            # 检查至少有一个运算符被选中
+            if (not self.add_enabled.isChecked() and 
+                not self.sub_enabled.isChecked() and 
+                not self.mul_enabled.isChecked() and 
+                not self.div_enabled.isChecked()):
+                raise ValueError("Must activate at least one operator")
+
+            # 保存启用的运算符
+            enabled_ops = []
+            if self.add_enabled.isChecked():
+                enabled_ops.append('+')
+            if self.sub_enabled.isChecked():
+                enabled_ops.append('-')
+            if self.mul_enabled.isChecked():
+                enabled_ops.append('*')
+            if self.div_enabled.isChecked():
+                enabled_ops.append('/')
+
+            # 保存时间设置
+            time_text = self.time_combo.currentText()
+            if time_text == "30s":
+                game_time = 30
+            elif time_text == "60s":
+                game_time = 60
+            elif time_text == "120s":
+                game_time = 120
+            else:  # 300秒
+                game_time = 300
+
             # 保存设置
             self.settings = {
+                "enabled_ops": enabled_ops,
+                "game_time": game_time,
                 "add": {
                     "x_min": add_x_min,
                     "x_max": add_x_max,
@@ -221,7 +282,7 @@ class SettingsWindow(QDialog):
             
         except ValueError as e:
             QMessageBox.warning(self, "Invalid Input", 
-                                f"Please enter valid positive integers.\nError: {str(e)}")
+                                f"Please check inputs.\nError: {str(e)}")
     
     def get_settings(self):
         """返回用户设置"""
@@ -230,20 +291,20 @@ class SettingsWindow(QDialog):
     def show_help_dialog(self):
         """显示自定义帮助对话框"""
         help_dialog = QMessageBox(self)
-        help_dialog.setWindowTitle("游戏设置帮助")
+        help_dialog.setWindowTitle("Help")
         help_dialog.setTextFormat(Qt.RichText)
         help_dialog.setText("""
-            <h3>游戏设置指南</h3>
-            <p><b>加法设置</b>: 定义加法运算中两个操作数的范围</p>
-            <p><b>减法设置</b>: 定义减法运算的范围（结果自动确保非负）</p>
-            <p><b>乘法设置</b>: 定义乘法运算中两个操作数的范围</p>
-            <p><b>除法设置</b>: 定义除数和结果的整数范围</p>
-            <p>所有值必须是正整数，且最小值≤最大值</p>
+            <h3>Game Help</h3>
+            <p><b>Addition</b>: Set the range of two numbers in addition</p>
+            <p><b>Subtraction</b>: Set the range of two numbers in subtraction (result is always non-negative)</p>
+            <p><b>Multiplication</b>: Set the range of two numbers in multiplication</p>
+            <p><b>Division</b>: Set the range of divisor and result (result is always an integer)</p>
+            <p>All values must be positive integers, and min ≤ max</p>
             <p><b>Author</b>: lsh</p>
             <a href="https://github.com/largeface-cat">Github</a>
             """)
         # 添加自定义按钮
-        help_dialog.addButton("我明白了", QMessageBox.AcceptRole)
+        help_dialog.addButton("OK", QMessageBox.AcceptRole)
         help_dialog.exec()
 
 # [file content end]
